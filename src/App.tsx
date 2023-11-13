@@ -67,12 +67,6 @@ type PointerDownState = {
     y: number;
   };
 };
-// This is so that we use the bundled excalidraw.development.js file instead
-// of the actual source code
-
-const COMMENT_ICON_DIMENSION = 32;
-const COMMENT_INPUT_HEIGHT = 50;
-const COMMENT_INPUT_WIDTH = 150;
 
 export default function App() {
   const appRef = useRef<any>(null);
@@ -89,8 +83,6 @@ export default function App() {
   const [commentIcons, setCommentIcons] = useState<{ [id: string]: Comment }>(
     {}
   );
-  const [comment, setComment] = useState<Comment | null>(null);
-
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
   }>({ promise: null! });
@@ -103,10 +95,10 @@ export default function App() {
 
   useHandleLibrary({ excalidrawAPI });
 
-  const fetchData = async (imagesrc:any) => {
-    console.log("imagesrc f",imagesrc)
-    const res = await fetch(imagesrc.length>0 ?imagesrc:"/rocket.jpeg");
-    console.log("fetch",res)
+  const fetchData = async (imagesrc: any) => {
+    console.log("imagesrc f", imagesrc);
+    const res = await fetch(imagesrc.length > 0 ? imagesrc : "/rocket.jpeg");
+    console.log("fetch", res);
     const imageData = await res.blob();
     const reader = new FileReader();
     reader.readAsDataURL(imageData);
@@ -123,9 +115,9 @@ export default function App() {
       ];
 
       //@ts-ignore
-     // initialStatePromiseRef.current.promise.resolve(initialData);
-     initialStatePromiseRef.current.promise.resolve(initialData);
-      console.log("initialStatePromiseRef",initialStatePromiseRef)
+      // initialStatePromiseRef.current.promise.resolve(initialData);
+      initialStatePromiseRef.current.promise.resolve(initialData);
+      console.log("initialStatePromiseRef", initialStatePromiseRef);
       excalidrawAPI?.addFiles(imagesArray);
     };
   };
@@ -133,32 +125,9 @@ export default function App() {
     if (!excalidrawAPI) {
       return;
     }
-
+  
     fetchData("");
-   
   }, [excalidrawAPI]);
-
-  const renderTopRightUI = (isMobile: boolean) => {
-    return (
-      <>
-        {!isMobile && (
-          <LiveCollaborationTrigger
-            isCollaborating={isCollaborating}
-            onSelect={() => {
-              window.alert("Collab dialog clicked");
-            }}
-          />
-        )}
-        <button
-          onClick={() => alert("This is dummy top right UI")}
-          style={{ height: "2.5rem" }}
-        >
-          {" "}
-          Click me{" "}
-        </button>
-      </>
-    );
-  };
 
   const updateScene = () => {
     // const sceneData = {
@@ -167,22 +136,24 @@ export default function App() {
     //       viewBackgroundColor: "./rocket.jpeg"
     //   },
     // };
-    const backgroundImageElement = [{
-      type: "image",
-      id: "backgroundImage",
-      x: 100,
-      y: 100,
-      width: 200,
-      height: 200,
-      image: {
-        src: "https://idsb.tmgrup.com.tr/ly/uploads/images/2022/12/19/thumbs/800x531/247181.jpg?v=1671435583",
-        crossOrigin: "anonymous", // If your image is hosted on a different domain
+    const backgroundImageElement = [
+      {
+        type: "image",
+        id: "backgroundImage",
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        image: {
+          src: "https://idsb.tmgrup.com.tr/ly/uploads/images/2022/12/19/thumbs/800x531/247181.jpg?v=1671435583",
+          crossOrigin: "anonymous", // If your image is hosted on a different domain
+        },
       },
-    }];
+    ];
     const sceneData = {
       elements: restoreElements(backgroundImageElement as any, null),
     };
-  
+
     excalidrawAPI?.updateScene(sceneData as any);
   };
 
@@ -203,7 +174,7 @@ export default function App() {
         // signal that we're handling the redirect ourselves
         event.preventDefault();
         // do a custom redirect, such as passing to react-router
-        // ...
+       
       }
     },
     []
@@ -221,288 +192,114 @@ export default function App() {
     });
     window.alert(`Copied to clipboard as ${type} successfully`);
   };
-  const [textElement, setTextElement] = useState<Comment | null>(null);
 
-  // ... (existing code)
+  const addTextElement = async() => {
+    console.log("called");
+    // const newTextElement: any =  [{
+    //   id: "MB9CSH621UdIKH8MEgOhaM",
+    //   type: "text",
+    //   x: 331.83412499999997,
+    //   y: 141.984625,
+    //   width: 153,
+    //   height: 165,
+    //   angle: 0,
+    //   strokeColor: "#000000",
+    //   backgroundColor: "#e64980",
+    //   fillStyle: "solid",
+    //   strokeWidth: 1,
+    //   strokeStyle: "solid",
+    //   roughness: 1,
+    //   opacity: 100,
+    //   groupIds: [],
+    //   strokeSharpness: "sharp",
+    //   seed: 802336758,
+    //   version: 77,
+    //   versionNonce: 227885290,
+    //   isDeleted: false,
+    //   boundElements: null,
+    //   updated: 1639729535736,
+    //   text: "Hellllllo World!!!\nSticky \nnotes :)",
+    //   fontSize: 20,
+    //   fontFamily: 2,
+    //   textAlign: "center",
+    //   verticalAlign: "middle",
+    //   baseline: 118,
+    //   // containerId: "6sVDp9mCGQTomD9nCg5w1b",
+    //   originalText: "Helllllo World!!!\n\nSticky notes :)",
 
-  const addTextElement = () => {
-   console.log("called")
-      const newTextElement: any =   [ {
-        id: "MB9CSH621UdIKH8MEgOhaM",
-        type: "text",
-        x: 331.83412499999997,
-        y: -441.984625,
-        width: 153,
-        height: 165,
+    // }];
+
+    const newTextElement: any = [
+      {
+        fileId: "rocket",
+        id: "6-AIA3cpXH6jwqerbF6rp",
+        type: "image",
+        x: 237.33333121405704,
+        y: -37.819445356910634,
+        width: 349.3333333333333,
+        height: 262,
         angle: 0,
-        strokeColor: "#000000",
-        backgroundColor: "#e64980",
-        fillStyle: "solid",
+        strokeColor: "transparent",
+        backgroundColor: "transparent",
+        fillStyle: "hachure",
         strokeWidth: 1,
         strokeStyle: "solid",
         roughness: 1,
         opacity: 100,
         groupIds: [],
-        strokeSharpness: "sharp",
-        seed: 802336758,
-        version: 77,
-        versionNonce: 227885290,
+        frameId: null,
+        roundness: null,
+        seed: 795684509,
+        version: 4,
+        versionNonce: 916617149,
         isDeleted: false,
         boundElements: null,
-        updated: 1639729535736,
-        text: "Hellllllo \nWorld!!!\n\nSticky \nnotes :)",
-        fontSize: 20,
-        fontFamily: 1,
-        textAlign: "center",
-        verticalAlign: "middle",
-        baseline: 118,
-        containerId: "6sVDp9mCGQTomD9nCg5w1b",
-        originalText: "Helllllo World!!!\n\nSticky notes :)",
-        customData: {
-          id: "text-1",
-          version: "1"
-        }
-      }]
-      const sceneData = {
-        elements: restoreElements(newTextElement,null),
-      };
-      console.log("sceneData",sceneData)
-  
-      excalidrawAPI?.updateScene(sceneData as any);
+        updated: 1699879238757,
+        link: null,
+        locked: false,
+        // status: "pending",
+        // fileId: "793a93d9ebb97ed53759a2678c4c936b5202dc64",
+        scale: [1, 1],
+      },
+    ];
+    const currentEle = excalidrawAPI?.getSceneElements();
+    console.log("currentele", currentEle);
+    const updated = [...(currentEle || []), ...(newTextElement || [])];
+    // const sceneData = {
+    //   elements: [...(currentEle || []), ...(newTextElement || [])],
+    // };
+    const sceneData = {
+      elements: restoreElements(updated, null),
+    };
+    console.log("sceneData", sceneData);
+
+    excalidrawAPI?.updateScene(sceneData as any);
+    const res = await fetch("/rocket.jpeg");
+    console.log("fetch", res);
+    const imageData = await res.blob();
+    const reader = new FileReader();
+    reader.readAsDataURL(imageData);
+
+    reader.onload = function () {
+      const imagesArray: BinaryFileData[] = [
+        {
+          id: "rocket" as BinaryFileData["id"],
+          dataURL: reader.result as BinaryFileData["dataURL"],
+          mimeType: MIME_TYPES.jpg,
+          created: 1644915140367,
+          lastRetrieved: 1644915140367,
+        },
+      ];
+
     
+      excalidrawAPI?.addFiles(imagesArray);
+    };
   };
   const [pointerData, setPointerData] = useState<{
     pointer: { x: number; y: number };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   } | null>(null);
-
-  const onPointerDown = (
-    activeTool: AppState["activeTool"],
-    pointerDownState: ExcalidrawPointerDownState
-  ) => {
-    if (activeTool.type === "custom" && activeTool.customType === "comment") {
-      const { x, y } = pointerDownState.origin;
-      setComment({ x, y, value: "" });
-    }
-  };
-
-  const rerenderCommentIcons = () => {
-    if (!excalidrawAPI) {
-      return false;
-    }
-    const commentIconsElements = appRef.current.querySelectorAll(
-      ".comment-icon"
-    ) as HTMLElement[];
-    commentIconsElements.forEach((ele) => {
-      const id = ele.id;
-      const appstate = excalidrawAPI.getAppState();
-      const { x, y } = sceneCoordsToViewportCoords(
-        { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
-        appstate
-      );
-      ele.style.left = `${
-        x - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetLeft
-      }px`;
-      ele.style.top = `${
-        y - COMMENT_ICON_DIMENSION / 2 - appstate!.offsetTop
-      }px`;
-    });
-  };
-
-  const onPointerMoveFromPointerDownHandler = (
-    pointerDownState: PointerDownState
-  ) => {
-    return withBatchedUpdatesThrottled((event) => {
-      if (!excalidrawAPI) {
-        return false;
-      }
-      const { x, y } = viewportCoordsToSceneCoords(
-        {
-          clientX: event.clientX - pointerDownState.hitElementOffsets.x,
-          clientY: event.clientY - pointerDownState.hitElementOffsets.y,
-        },
-        excalidrawAPI.getAppState()
-      );
-      setCommentIcons({
-        ...commentIcons,
-        [pointerDownState.hitElement.id!]: {
-          ...commentIcons[pointerDownState.hitElement.id!],
-          x,
-          y,
-        },
-      });
-    });
-  };
-  const onPointerUpFromPointerDownHandler = (
-    pointerDownState: PointerDownState
-  ) => {
-    return withBatchedUpdates((event) => {
-      window.removeEventListener("pointermove", pointerDownState.onMove);
-      window.removeEventListener("pointerup", pointerDownState.onUp);
-      excalidrawAPI?.setActiveTool({ type: "selection" });
-      const distance = distance2d(
-        pointerDownState.x,
-        pointerDownState.y,
-        event.clientX,
-        event.clientY
-      );
-      if (distance === 0) {
-        if (!comment) {
-          setComment({
-            x: pointerDownState.hitElement.x + 60,
-            y: pointerDownState.hitElement.y,
-            value: pointerDownState.hitElement.value,
-            id: pointerDownState.hitElement.id,
-          });
-        } else {
-          setComment(null);
-        }
-      }
-    });
-  };
-  const saveComment = () => {
-    if (!comment) {
-      return;
-    }
-    if (!comment.id && !comment.value) {
-      setComment(null);
-      return;
-    }
-    const id = comment.id || nanoid();
-    setCommentIcons({
-      ...commentIcons,
-      [id]: {
-        x: comment.id ? comment.x - 60 : comment.x,
-        y: comment.y,
-        id,
-        value: comment.value,
-      },
-    });
-    setComment(null);
-  };
-
-  const renderCommentIcons = () => {
-    return Object.values(commentIcons).map((commentIcon) => {
-      if (!excalidrawAPI) {
-        return false;
-      }
-      const appState = excalidrawAPI.getAppState();
-      const { x, y } = sceneCoordsToViewportCoords(
-        { sceneX: commentIcon.x, sceneY: commentIcon.y },
-        excalidrawAPI.getAppState()
-      );
-      return (
-        <div
-          id={commentIcon.id}
-          key={commentIcon.id}
-          style={{
-            top: `${y - COMMENT_ICON_DIMENSION / 2 - appState!.offsetTop}px`,
-            left: `${x - COMMENT_ICON_DIMENSION / 2 - appState!.offsetLeft}px`,
-            position: "absolute",
-            zIndex: 1,
-            width: `${COMMENT_ICON_DIMENSION}px`,
-            height: `${COMMENT_ICON_DIMENSION}px`,
-            cursor: "pointer",
-            touchAction: "none",
-          }}
-          className="comment-icon"
-          onPointerDown={(event) => {
-            event.preventDefault();
-            if (comment) {
-              commentIcon.value = comment.value;
-              saveComment();
-            }
-            const pointerDownState: any = {
-              x: event.clientX,
-              y: event.clientY,
-              hitElement: commentIcon,
-              hitElementOffsets: { x: event.clientX - x, y: event.clientY - y },
-            };
-            const onPointerMove =
-              onPointerMoveFromPointerDownHandler(pointerDownState);
-            const onPointerUp =
-              onPointerUpFromPointerDownHandler(pointerDownState);
-            window.addEventListener("pointermove", onPointerMove);
-            window.addEventListener("pointerup", onPointerUp);
-
-            pointerDownState.onMove = onPointerMove;
-            pointerDownState.onUp = onPointerUp;
-
-            excalidrawAPI?.setActiveTool({
-              type: "custom",
-              customType: "comment",
-            });
-          }}
-        >
-          <div className="comment-avatar">
-            <img src="doremon.png" alt="doremon" />
-          </div>
-        </div>
-      );
-    });
-  };
-
-  const renderComment = () => {
-    if (!comment) {
-      return null;
-    }
-    const appState = excalidrawAPI?.getAppState()!;
-    const { x, y } = sceneCoordsToViewportCoords(
-      { sceneX: comment.x, sceneY: comment.y },
-      appState
-    );
-    let top = y - COMMENT_ICON_DIMENSION / 2 - appState.offsetTop;
-    let left = x - COMMENT_ICON_DIMENSION / 2 - appState.offsetLeft;
-
-    if (
-      top + COMMENT_INPUT_HEIGHT <
-      appState.offsetTop + COMMENT_INPUT_HEIGHT
-    ) {
-      top = COMMENT_ICON_DIMENSION / 2;
-    }
-    if (top + COMMENT_INPUT_HEIGHT > appState.height) {
-      top = appState.height - COMMENT_INPUT_HEIGHT - COMMENT_ICON_DIMENSION / 2;
-    }
-    if (
-      left + COMMENT_INPUT_WIDTH <
-      appState.offsetLeft + COMMENT_INPUT_WIDTH
-    ) {
-      left = COMMENT_ICON_DIMENSION / 2;
-    }
-    if (left + COMMENT_INPUT_WIDTH > appState.width) {
-      left = appState.width - COMMENT_INPUT_WIDTH - COMMENT_ICON_DIMENSION / 2;
-    }
-
-    return (
-      <textarea
-        className="comment"
-        style={{
-          top: `${top}px`,
-          left: `${left}px`,
-          position: "absolute",
-          zIndex: 1,
-          height: `${COMMENT_INPUT_HEIGHT}px`,
-          width: `${COMMENT_INPUT_WIDTH}px`,
-        }}
-        ref={(ref) => {
-          setTimeout(() => ref?.focus());
-        }}
-        placeholder={comment.value ? "Reply" : "Comment"}
-        value={comment.value}
-        onChange={(event) => {
-          setComment({ ...comment, value: event.target.value });
-        }}
-        onBlur={saveComment}
-        onKeyDown={(event) => {
-          if (!event.shiftKey && event.key === "Enter") {
-            event.preventDefault();
-            saveComment();
-          }
-        }}
-      />
-    );
-  };
 
   const renderSidebar = () => {
     return (
@@ -513,100 +310,97 @@ export default function App() {
       // </Sidebar>
     );
   };
-
-//   const handleDrop = useCallback(
-    
-//     async (event: React.DragEvent<HTMLDivElement>) => {
-//       event.preventDefault();
-//       console.log("func call");
-//       const files = event.dataTransfer.files;
-//       console.log("func files",files);
-//       if (files.length > 0) {
-//         const file = files[0];
-
-//         if (file.type.startsWith("image/")) {
-//           const reader = new FileReader();
-//           reader.readAsDataURL(file);
-
-//           reader.onload = function () {
-//             const imagesArray: BinaryFileData[] = [
-//               {
-//                 id: file.name as any, // Type assertion here
-//                 dataURL: reader.result as BinaryFileData["dataURL"],
-//                 mimeType: file.type as any,
-//                 created: Date.now(),
-//                 lastRetrieved: Date.now(),
-//               },
-//             ];
-// console.log("imagesArray",imagesArray)
-//             // Add the image to the Excalidraw canvas
-//             excalidrawAPI?.addFiles(imagesArray);
-//           };
-//         }
-//       }
-//     },
-//     [excalidrawAPI,drop]
-//   );
-
-//   useEffect(() => {
-//     const canvasWrapper = appRef.current.querySelector(".excalidraw-wrapper");
-//     console.log("effect");
-//     // Listen for drop events on the canvas
-//     canvasWrapper.addEventListener("drop", handleDrop);
-
-//     // Prevent default behavior for drag-and-drop to allow dropping files
-//     canvasWrapper.addEventListener("dragover", (event: any) => {
-//       event.preventDefault();
-//     });
-
-//     // Cleanup event listeners on component unmount
-//     return () => {
-//       canvasWrapper.removeEventListener("drop", handleDrop);
-//       canvasWrapper.removeEventListener("dragover", (event: any) => {
-//         event.preventDefault();
-//       });
-//     };
-//   }, [handleDrop]);
   const handleImageDragStart = (event: React.DragEvent<HTMLImageElement>) => {
     // Customize the drag data to include necessary information
+    console.log("srcc",event)
     const imageSrc = event.currentTarget.src;
-    console.log("imageSrc",imageSrc);
-    event.dataTransfer.setData("text/plain", imageSrc);
-    fetchData(imageSrc);
-    setDrop(true)
+    console.log("imageSrc", imageSrc);
+    // event.dataTransfer.setData("text/plain", imageSrc);
+    // fetchData(imageSrc);
+    handleRightSideDivDrop(imageSrc)
+    setDrop(true);
   };
-  const handleRightSideDivDrop = async (imageSrc:any) => {
-   // event.preventDefault();
+  const handleRightSideDivDrop = async (imageSrc: any) => {
+    // event.preventDefault();
     //const imageSrc = event.dataTransfer.getData("text/plain");
+    var canvas = document.querySelector('.excalidraw__canvas') as HTMLCanvasElement;
+    var width = canvas?.width;
+    var height = canvas?.height;
+console.log("class e",canvas,width,height)
+
+
+    const newTextElement: any = [
+      {
+        fileId: "rocket",
+        id: "6-AIA3cpXH6jwqerbF6rp",
+        type: "image",
+        x:0.33333121405704,
+        y: 0.819445356910634,
+        width: width/1.80,
+        height:height/1.80,
+        angle: 0,
+        strokeColor: "transparent",
+        backgroundColor: "transparent",
+        fillStyle: "hachure",
+        strokeWidth: 1,
+        strokeStyle: "solid",
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: 795684509,
+        version: 4,
+        versionNonce: 916617149,
+        isDeleted: false,
+        boundElements: null,
+        updated: 1699879238757,
+        link: null,
+        locked: false,
+        // status: "pending",
+        // fileId: "793a93d9ebb97ed53759a2678c4c936b5202dc64",
+        scale: [1,1],
+      },
+    ];
+    const currentEle = excalidrawAPI?.getSceneElements();
+    console.log("currentele", currentEle);
+    const filteredCurrentEle = currentEle?.filter(
+      (element:any) => element?.fileId !== newTextElement[0]?.fileId
+    );
     
-    const response = await fetch(imageSrc);
-  const blob = await response.blob();
+    const updated = [...(filteredCurrentEle || []), ...(newTextElement || [])];
+    // const sceneData = {
+    //   elements: [...(currentEle || []), ...(newTextElement || [])],
+    // };
+    const sceneData = {
+      elements: restoreElements(updated, null),
+    };
+    console.log("sceneData", sceneData);
 
-    console.log("imageSrcc drag",blob);
+    excalidrawAPI?.updateScene(sceneData as any);
+    const res = await fetch(imageSrc);
+    console.log("fetch", res);
+    const imageData = await res.blob();
     const reader = new FileReader();
-          reader.readAsDataURL(blob);
+    reader.readAsDataURL(imageData);
 
-          reader.onload = function () {
-            const imagesArray: BinaryFileData[] = [
-              {
-                id: `image_${Date.now()}` as any,
-                dataURL: reader.result as BinaryFileData["dataURL"],
-                mimeType: "image/png",
-                created: Date.now(),
-                lastRetrieved: Date.now(),
-              },
-            ];
-            console.log("imagesArraydrag",imagesArray)
-            console.log("Elements before adding file:", excalidrawAPI?.getSceneElements());
+    reader.onload = function () {
+      const imagesArray: BinaryFileData[] = [
+        {
+          id: "rocket" as BinaryFileData["id"],
+          dataURL: reader.result as BinaryFileData["dataURL"],
+          mimeType: MIME_TYPES.jpg,
+          created: 1644915140367,
+          lastRetrieved: 1644915140367,
+        },
+      ];
 
-            excalidrawAPI?.addFiles(imagesArray);
-            console.log("Elements after adding file:", excalidrawAPI?.getSceneElements());
-
-            //setDrop(false)
-          }
-
+    
+      excalidrawAPI?.addFiles(imagesArray);
+    };
+   
   };
-  // ... (rest of the existing code)
+  
 
   const renderMenu = () => {
     return (
@@ -638,6 +432,20 @@ export default function App() {
   };
   return (
     <div className="App" ref={appRef}>
+        <div className="navbar">
+    <div className="dropdown">
+      <button className="dropbtn">Select Background</button>
+      <div className="dropdown-content">
+        <img src="messi.png"   onClick={(event)=>{  event.preventDefault();
+                handleImageDragStart(event as any)}} alt="Image 1"/>
+        <img src="pika.jpeg"   onClick={(event)=>{  event.preventDefault();
+                handleImageDragStart(event as any)}} alt="Image 2"/>
+        <img src="rocket.jpeg"   onClick={(event)=>{  event.preventDefault();
+                handleImageDragStart(event as any)}} alt="Image 3"/>
+     
+      </div>
+    </div>
+  </div>
       <h1>HTML canvas</h1>
       <ExampleSidebar>
         <div className="button-wrapper">
@@ -695,9 +503,9 @@ export default function App() {
           <button onClick={onCopy.bind(null, "png")}>
             Copy to Clipboard as PNG
           </button>
-          <button onClick={onCopy.bind(null, "svg")}>
+          {/* <button onClick={onCopy.bind(null, "svg")}>
             Copy to Clipboard as SVG
-          </button>
+          </button> */}
           <button onClick={onCopy.bind(null, "json")}>
             Copy to Clipboard as JSON
           </button>
@@ -714,29 +522,50 @@ export default function App() {
             <div>y: {pointerData?.pointer.y ?? 0}</div>
           </div>
         </div>
+
+      
+        {/* <div
+            onClick={(event)=>{
+              event.preventDefault();
+             // handleRightSideDivDrop(event)
+            }
+            }
+           
+          >
+            {" "}
+            <img
+              onClick={(event)=>{  event.preventDefault();
+                handleImageDragStart(event as any)}}
+             // src="messi.png"
+              alt="messi"
+              style={{
+                height: "200px",
+                width: "240px",
+              }}
+            />
+          </div> */}
         <div className="parentDiv">
           <div
             className="excalidraw-wrapper"
             onDrop={(event) => {
-             // handleDrop(event);
-
+              // handleDrop(event);
               console.log("droppp");
             }}
             onDragOver={(event) => event.preventDefault()}
           >
-            <div
+            {/* <div
               style={{
                 position: "absolute",
                 left: "50%",
                 bottom: "20px",
                 display: "flex",
-                zIndex: 9999999999999999,
+                zIndex: 999999,
                 padding: "5px 10px",
                 transform: "translateX(-50%)",
                 background: "rgba(255, 255, 255, 0.8)",
                 gap: "1rem",
               }}
-            ></div>
+            ></div> */}
             <Excalidraw
               ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
               initialData={initialStatePromiseRef.current.promise}
@@ -754,10 +583,10 @@ export default function App() {
               theme={theme as any}
               name="Custom name of drawing"
               UIOptions={{ canvasActions: { loadScene: false } }}
-              // renderTopRightUI={renderTopRightUI}
               onLinkOpen={onLinkOpen}
-              onPointerDown={onPointerDown}
-              onScrollChange={rerenderCommentIcons}
+              detectScroll={true}
+              // onPointerDown={onPointerDown}
+            
               // renderSidebar={renderSidebar}
             >
               {/* {excalidrawAPI && (
@@ -766,38 +595,41 @@ export default function App() {
               </Footer>
             )}
             {renderMenu()} */}
-              <img
-          src="messi.png"
-          alt="background"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            pointerEvents: "none", // Make sure the image doesn't interfere with interactions
-          }}
-        />
             </Excalidraw>
-            <img
-          src="messi.png"
-          alt="background"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            pointerEvents: "none", // Make sure the image doesn't interfere with interactions
-          }}
-        />
-
-            {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
-            {comment && renderComment()}
+            {/* <img
+              src="messi.png"
+              alt="background"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+              }}
+            /> */}
           </div>
-          <div    onDrop={handleRightSideDivDrop} onDragOver={(event) => event.preventDefault()}>
+          <div className="sidebarr">
+    <div className="sidebarr-header">
+      <h2>Image Collection</h2>
+    </div>
+    <div className="image-list"
+      onDrop={handleRightSideDivDrop}
+      onDragOver={(event) => event.preventDefault()}
+      >
+      <img src="doremon.png"   onDragStart={handleImageDragStart} alt="Image 1"/>
+      <img src="pika.jpeg"   onDragStart={handleImageDragStart} alt="Image 2"/>
+      <img src="messi.png"  onDragStart={handleImageDragStart} alt="Image 3"/>
+      <img src="rocket.jpeg"  onDragStart={handleImageDragStart} alt="Image 3"/>
+    </div>
+  </div>
+          {/* <div
+            onDrop={handleRightSideDivDrop}
+            onDragOver={(event) => event.preventDefault()}
+          >
             {" "}
-            <img onDragStart={handleImageDragStart}
+            <img
+              onDragStart={handleImageDragStart}
               src="messi.png"
               alt="messi"
               style={{
@@ -805,100 +637,12 @@ export default function App() {
                 width: "240px",
               }}
             />
-          </div>
+          </div> */}
         </div>
-        <button style={{background:"/rocket.jpeg"}} onClick={addTextElement}>Add Text Element</button>
-        {/* <div className="export-wrapper button-wrapper">
-          <label className="export-wrapper__checkbox">
-            <input
-              type="checkbox"
-              checked={exportWithDarkMode}
-              onChange={() => setExportWithDarkMode(!exportWithDarkMode)}
-            />
-            Export with dark mode
-          </label>
-          <label className="export-wrapper__checkbox">
-            <input
-              type="checkbox"
-              checked={exportEmbedScene}
-              onChange={() => setExportEmbedScene(!exportEmbedScene)}
-            />
-            Export with embed scene
-          </label>
-          <button
-            onClick={async () => {
-              if (!excalidrawAPI) {
-                return;
-              }
-              const svg = await exportToSvg({
-                elements: excalidrawAPI?.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                  exportEmbedScene,
-                  width: 300,
-                  height: 100
-                },
-                files: excalidrawAPI?.getFiles()
-              });
-              appRef.current.querySelector(".export-svg").innerHTML =
-                svg.outerHTML;
-            }}
-          >
-            Export to SVG
-          </button>
-          <div className="export export-svg"></div>
-
-          <button
-            onClick={async () => {
-              if (!excalidrawAPI) {
-                return;
-              }
-              const blob = await exportToBlob({
-                elements: excalidrawAPI?.getSceneElements(),
-                mimeType: "image/png",
-                appState: {
-                  ...initialData.appState,
-                  exportEmbedScene,
-                  exportWithDarkMode
-                },
-                files: excalidrawAPI?.getFiles()
-              });
-              setBlobUrl(window.URL.createObjectURL(blob));
-            }}
-          >
-            Export to Blob
-          </button>
-          <div className="export export-blob">
-            <img src={blobUrl} alt="" />
-          </div>
-
-          <button
-            onClick={async () => {
-              if (!excalidrawAPI) {
-                return;
-              }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode
-                },
-                files: excalidrawAPI.getFiles()
-              });
-              const ctx = canvas.getContext("2d")!;
-              ctx.font = "30px Virgil";
-              ctx.strokeText("My custom text", 50, 60);
-              setCanvasUrl(canvas.toDataURL());
-            }}
-          >
-            Export to Canvas
-          </button>
-          <div className="export export-canvas">
-            <img src={canvasUrl} alt="" />
-          </div>
-        </div> */}
+        <button style={{ background: "/rocket.jpeg" }} onClick={addTextElement}>
+          Add Text Element
+        </button>
       </ExampleSidebar>
-    </div>
+    </div> 
   );
 }
