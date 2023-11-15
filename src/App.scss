@@ -101,14 +101,14 @@
   position: fixed;
   top: 0;
   right: 0;
-  background-color: darkseagreen;
+  background-color:ghostwhite;
   padding-top: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebarr-header {
   text-align: center;
-  color: white;
+  color: #2f3435;
   padding: 10px;
 }
 
@@ -165,4 +165,20 @@
 
 .dropdown:hover .dropdown-content {
   display: block;
+}
+.color-option{
+  height: 30px;
+  width: 40px;
+}
+button.dropdown-menu-button.zen-mode-transition{
+  display: none;
+}
+.excalidraw .layer-ui__wrapper .zen-mode-transition{
+  margin-top: 3rem;
+}
+.excalidraw .App-toolbar__divider,label.ToolIcon.ToolIcon__lock.ToolIcon_size_medium{
+  display: none;
+}
+.undo-redo-buttons.zen-mode-transition{
+  display: none;
 }

@@ -25,12 +25,9 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "@excalidraw/excalidraw/types/types";
-
 import ExampleSidebar from "./sidebar/ExampleSidebar";
-
 import "./App.scss";
 import initialData from "./initialData";
-
 import { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import { nanoid } from "nanoid";
 import CustomFooter from "./CustomFooter";
@@ -49,28 +46,10 @@ declare global {
   }
 }
 
-type Comment = {
-  x: number;
-  y: number;
-  value: string;
-  id?: string;
-};
-
-type PointerDownState = {
-  x: number;
-  y: number;
-  hitElement: Comment;
-  onMove: any;
-  onUp: any;
-  hitElementOffsets: {
-    x: number;
-    y: number;
-  };
-};
-
 export default function App() {
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("#ffffff");
   const [drop, setDrop] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
@@ -79,10 +58,6 @@ export default function App() {
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState("light");
-  const [isCollaborating, setIsCollaborating] = useState(false);
-  const [commentIcons, setCommentIcons] = useState<{ [id: string]: Comment }>(
-    {}
-  );
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
   }>({ promise: null! });
@@ -90,43 +65,58 @@ export default function App() {
     initialStatePromiseRef.current.promise = resolvablePromise();
   }
 
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+  };
+
+  const changeBgColor = () => {
+    const currentEle = excalidrawAPI?.getSceneElements();
+    const sceneData = {
+      elements: restoreElements(currentEle, null),
+      appState: {
+        viewBackgroundColor: selectedColor,
+      },
+    };
+    excalidrawAPI?.updateScene(sceneData as any);
+  };
+
+  useEffect(() => {
+    changeBgColor();
+  }, [selectedColor]);
+  const [contentType, setContentType] = useState<string>('image'); 
+  const handleContentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setContentType(e.target.value);
+  };
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
   useHandleLibrary({ excalidrawAPI });
 
-  const fetchData = async (imagesrc: any) => {
-    console.log("imagesrc f", imagesrc);
-    const res = await fetch(imagesrc.length > 0 ? imagesrc : "/rocket.jpeg");
-    console.log("fetch", res);
-    const imageData = await res.blob();
-    const reader = new FileReader();
-    reader.readAsDataURL(imageData);
-
-    reader.onload = function () {
-      const imagesArray: BinaryFileData[] = [
-        {
-          id: "rockettt" as BinaryFileData["id"],
-          dataURL: reader.result as BinaryFileData["dataURL"],
-          mimeType: MIME_TYPES.jpg,
-          created: 1644915140367,
-          lastRetrieved: 1644915140367,
-        },
-      ];
-
-      //@ts-ignore
-      // initialStatePromiseRef.current.promise.resolve(initialData);
-      initialStatePromiseRef.current.promise.resolve(initialData);
-      console.log("initialStatePromiseRef", initialStatePromiseRef);
-      excalidrawAPI?.addFiles(imagesArray);
-    };
+  const fetchData = async () => {
+    // const res = await fetch(imagesrc.length > 0 ? imagesrc : "");
+    // const imageData = await res.blob();
+    // const reader = new FileReader();
+    // reader.readAsDataURL(imageData);
+    // reader.onload = function () {
+    //   const imagesArray: BinaryFileData[] = [
+    //     {
+    //       id: "test" as BinaryFileData["id"],
+    //       dataURL: reader.result as BinaryFileData["dataURL"],
+    //       mimeType: MIME_TYPES.jpg,
+    //       created: 1644915140367,
+    //       lastRetrieved: 1644915140367,
+    //     },
+    //   ];
+    initialStatePromiseRef.current.promise.resolve(initialData);
+    // excalidrawAPI?.addFiles(imagesArray);
   };
+
   useEffect(() => {
     if (!excalidrawAPI) {
       return;
     }
-  
-    fetchData("");
+
+    fetchData();
   }, [excalidrawAPI]);
 
   const updateScene = () => {
@@ -136,25 +126,24 @@ export default function App() {
     //       viewBackgroundColor: "./rocket.jpeg"
     //   },
     // };
-    const backgroundImageElement = [
-      {
-        type: "image",
-        id: "backgroundImage",
-        x: 100,
-        y: 100,
-        width: 200,
-        height: 200,
-        image: {
-          src: "https://idsb.tmgrup.com.tr/ly/uploads/images/2022/12/19/thumbs/800x531/247181.jpg?v=1671435583",
-          crossOrigin: "anonymous", // If your image is hosted on a different domain
-        },
-      },
-    ];
-    const sceneData = {
-      elements: restoreElements(backgroundImageElement as any, null),
-    };
-
-    excalidrawAPI?.updateScene(sceneData as any);
+    // const backgroundImageElement = [
+    //   {
+    //     type: "image",
+    //     id: "backgroundImage",
+    //     x: 100,
+    //     y: 100,
+    //     width: 200,
+    //     height: 200,
+    //     image: {
+    //       src: "https://idsb.tmgrup.com.tr/ly/uploads/images/2022/12/19/thumbs/800x531/247181.jpg?v=1671435583",
+    //       crossOrigin: "anonymous", // If your image is hosted on a different domain
+    //     },
+    //   },
+    // ];
+    // const sceneData = {
+    //   elements: restoreElements(backgroundImageElement as any, null),
+    // };
+    // excalidrawAPI?.updateScene(sceneData as any);
   };
 
   const onLinkOpen = useCallback(
@@ -174,7 +163,6 @@ export default function App() {
         // signal that we're handling the redirect ourselves
         event.preventDefault();
         // do a custom redirect, such as passing to react-router
-       
       }
     },
     []
@@ -193,18 +181,48 @@ export default function App() {
     window.alert(`Copied to clipboard as ${type} successfully`);
   };
 
-  const addTextElement = async() => {
+  const addTextElement = async () => {
     console.log("called");
-    // const newTextElement: any =  [{
+    //const newTextElement: any =  [
+      // {
+      //   type: "rectangle",
+      //   x: 100,
+      //   y: 100, width: 200,
+      //   height: 105,
+      //   strokeWidth: 2,
+      //   id: "1"
+      // },
+      // {
+      //   type: "diamond",
+      //   x: 120,
+      //   y: 120,
+      //   width: 200,
+      //   height: 105,
+      //   backgroundColor: "#fff3bf",
+      //   strokeWidth: 2,
+       
+      //   label: {
+      //     text: "HELLO EXCALIDRAW",
+      //     strokeColor: "black",
+      //     fontSize: 30
+      //   },
+      //   id: "2"
+      // },
+      // {
+      //   type: "frame",
+      //   children: [1, 2],
+      //   name: "My frame"
+      // }
+    //   {
     //   id: "MB9CSH621UdIKH8MEgOhaM",
     //   type: "text",
     //   x: 331.83412499999997,
     //   y: 141.984625,
-    //   width: 153,
-    //   height: 165,
+    //   width: 200,
+    //   height: 105,
     //   angle: 0,
     //   strokeColor: "#000000",
-    //   backgroundColor: "#e64980",
+    //   backgroundColor: "transparent",
     //   fillStyle: "solid",
     //   strokeWidth: 1,
     //   strokeStyle: "solid",
@@ -218,26 +236,365 @@ export default function App() {
     //   isDeleted: false,
     //   boundElements: null,
     //   updated: 1639729535736,
-    //   text: "Hellllllo World!!!\nSticky \nnotes :)",
+    //   text: "Item Name: soup \n Description: soup descrption \nPrice: $XX.XX",
     //   fontSize: 20,
     //   fontFamily: 2,
-    //   textAlign: "center",
+    //   textAlign: "left",
     //   verticalAlign: "middle",
     //   baseline: 118,
     //   // containerId: "6sVDp9mCGQTomD9nCg5w1b",
-    //   originalText: "Helllllo World!!!\n\nSticky notes :)",
+    //   originalText: "Helllllo World!!!\nSticky notes :)",
 
-    // }];
+    // }
+  //];
+  const headerText :any=[{
+    id: 'header',
+    type: 'text',
+    x: 331.83412499999997,
+    y: 100,
+    width: 200,
+    height: 35,
+    angle: 0,
+    strokeColor: '#000000',
+    backgroundColor: 'transparent',
+    fillStyle: 'solid',
+    strokeWidth: 1,
+    strokeStyle: 'solid',
+    roughness: 1,
+    opacity: 100,
+    groupIds: [],
+    strokeSharpness: 'sharp',
+    seed: 802336758,
+    version: 77,
+    versionNonce: 227885290,
+    isDeleted: false,
+    boundElements: null,
+    updated: 1639729535736,
+    text: 'Menu Header',
+    fontSize: 24,
+    fontFamily: 2,
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    baseline: 118,
+  }];
+  const newTextElement: any = [{
+    id: "frame1",
+    type: "rectangle",
+    x: 331.83412499999997,
+    y: 141.984625,
+    width: 200,
+    height: 105,
+    angle: 0,
+    strokeColor: "#000000",
+    backgroundColor: "transparent",
+    fillStyle: "solid",
+    strokeWidth: 1,
+    strokeStyle: "solid",
+    roughness: 1,
+    opacity: 100,
+    groupIds: ["itemName"],
+    strokeSharpness: "sharp",
+    seed: 802336758,
+    version: 77,
+    versionNonce: 227885290,
+    isDeleted: false,
+    boundElements: null,
+    updated: 1639729535736,
+    children:["itemName"]
+  }];
+  const createMenuItem = (name:any, description:any, price:any, x:any, y:any,index:any,length:any) => {
+    const frameId = `frame`;
 
+    const frame = {
+      id: frameId,
+      type: 'frame',
+      x,
+      y,
+      width: 210,
+      height: y+ length*5,
+      angle: 0,
+      strokeColor: 'transparent',
+      backgroundColor: 'transparent',
+      fillStyle: 'transparent',
+      strokeWidth: 0, 
+      strokeStyle: 'transparent',
+      roughness: 1,
+      opacity: 100,
+      groupIds: [],
+      strokeSharpness: '',
+      seed: 802336758,
+      version: 662,
+      versionNonce: 227885290,
+      isDeleted: false,
+      boundElements: null,
+      updated: 1639729535736,
+      name: " ",
+     // children: [`${frameId}_name`, `${frameId}_description`, `${frameId}_price`],
+    };
+
+    const itemNameText = createFrameElements(`${frameId}`, name, x+10, y + index*10, 100, 35, 20);
+    const descriptionText = createFrameElements(`${frameId}`, description, x+10, y + 20 + index*10, 100, 35, 12);
+    const priceText = createFrameElements(`${frameId}`, price, x+100+10, y+ index*10 , 100, 35, 18);
+
+    return [frame, itemNameText, descriptionText, priceText];
+  };
+
+  const createFrameElements = (id:any, text:any, x:any, y:any, width:any, height:any, fontSize:any) => ({
+    id,
+    type: 'text',
+    frameId:id,
+    x,
+    y,
+    width,
+    height,
+    angle: 0,
+    strokeColor: '#000000',
+    backgroundColor: 'transparent',
+    fillStyle: 'solid',
+    strokeWidth: 1,
+    strokeStyle: 'solid',
+    roughness: 1,
+    opacity: 100,
+    groupIds: [],
+    strokeSharpness: 'sharp',
+    seed: 802336758,
+    version: 77,
+    versionNonce: 227885290,
+    isDeleted: false,
+    boundElements: null,
+    updated: 1639729535736,
+    text,
+    fontSize,
+    fontFamily: 2,
+    textAlign: 'left',
+    verticalAlign: 'middle',
+    baseline: 118,
+  });
+
+  const createTextElements = (id:any, text:any, x:any, y:any, width:any, height:any, fontSize:any) => ({
+    id,
+    type: 'text',
+    x,
+    y,
+    width,
+    height,
+    angle: 0,
+    strokeColor: '#000000',
+    backgroundColor: 'transparent',
+    fillStyle: 'solid',
+    strokeWidth: 1,
+    strokeStyle: 'solid',
+    roughness: 1,
+    opacity: 100,
+    groupIds: [],
+    strokeSharpness: 'sharp',
+    seed: 802336758,
+    version: 77,
+    versionNonce: 227885290,
+    isDeleted: false,
+    boundElements: null,
+    updated: 1639729535736,
+    text,
+    fontSize,
+    fontFamily: 2,
+    textAlign: 'left',
+    verticalAlign: 'middle',
+    baseline: 118,
+  });
+  const menuItems = [
+    createMenuItem('Item 1', 'Description 1', '$10.99', 200, 150,1,2),
+    createMenuItem('Item 2', 'Description 2', '$15.99', 200, 200,1,2),
+    createMenuItem('Item 3', 'Description 3', '$17.99', 200, 250,1,2),
+  ];
+console.log("menus",headerText,menuItems[0])
+  const currentEle = excalidrawAPI?.getSceneElements();
+  // const updated = [...(currentEle || []), ...(newTextElement || [])];
+  
+  const updatedElements = ([] as any[]).concat(...menuItems);
+  const frames = updatedElements.filter(element => element.type === 'frame');
+
+  const filteredElements = frames.length > 1
+  ? updatedElements.filter((element, index) => index === 0 || element.type !== 'frame')
+  : updatedElements;
+  console.log("updatedElements",menuItems,updatedElements,currentEle,filteredElements)
+  const sceneData = {
+    elements: restoreElements(filteredElements as any, null),
+  };
+  excalidrawAPI?.updateScene(sceneData as any);
+    // const newBackgroundElement: any = [
+    //   {
+    //     fileId: "background",
+    //     id: "6-AIA3cpXH6jwqerbF6rp",
+    //     type: "image",
+    //     x: 237.33333121405704,
+    //     y: -37.819445356910634,
+    //     width: 349.3333333333333,
+    //     height: 262,
+    //     angle: 0,
+    //     strokeColor: "transparent",
+    //     backgroundColor: "transparent",
+    //     fillStyle: "hachure",
+    //     strokeWidth: 1,
+    //     strokeStyle: "solid",
+    //     roughness: 1,
+    //     opacity: 100,
+    //     groupIds: [],
+    //     frameId: null,
+    //     roundness: null,
+    //     seed: 795684509,
+    //     version: 4,
+    //     versionNonce: 916617149,
+    //     isDeleted: false,
+    //     boundElements: null,
+    //     updated: 1699879238757,
+    //     link: null,
+    //     locked: false,
+    //     // status: "pending",
+    //     // fileId: "793a93d9ebb97ed53759a2678c4c936b5202dc64",
+    //     scale: [1, 1],
+    //   },
+    // ];
+
+ // const sceneData = {
+    //   elements: [...(currentEle || []), ...(newTextElement || [])],
+    // };
+
+    // const res = await fetch("/rocket.jpeg");
+    // const imageData = await res.blob();
+    // const reader = new FileReader();
+    // reader.readAsDataURL(imageData);
+
+    // reader.onload = function () {
+    //   const imagesArray: BinaryFileData[] = [
+    //     {
+    //       id: "background" as BinaryFileData["id"],
+    //       dataURL: reader.result as BinaryFileData["dataURL"],
+    //       mimeType: MIME_TYPES.jpg,
+    //       created: 1644915140367,
+    //       lastRetrieved: 1644915140367,
+    //     },
+    //   ];
+
+    //   excalidrawAPI?.addFiles(imagesArray);
+    // };
+  };
+  const [pointerData, setPointerData] = useState<{
+    pointer: { x: number; y: number };
+    button: "down" | "up";
+    pointersMap: Gesture["pointers"];
+  } | null>(null);
+
+  const renderSidebar = () => {
+    return (
+      <></>
+      // <Sidebar>
+      //   <Sidebar.Header>Custom header!</Sidebar.Header>
+      //   Custom sidebar!
+      // </Sidebar>
+    );
+  };
+  const handleImageDragStart = (
+    event: React.DragEvent<HTMLImageElement>,
+    type: string
+  ) => {
+    const imageSrc = event.currentTarget.src;
+    if (type == "bg") handlebackgroundImageDivDrop(imageSrc);
+    else if (type == "imgdrop") {
+      handleRightSideDivDrop(imageSrc);
+    }
+  };
+  const handleRightSideDivDrop = async (imageSrc: any) => {
+    const canvas = document.querySelector(
+      ".excalidraw__canvas"
+    ) as HTMLCanvasElement;
+    const width = canvas?.width;
+    const height = canvas?.height;
+    const id: string = nanoid();
     const newTextElement: any = [
       {
-        fileId: "rocket",
+        fileId: id,
         id: "6-AIA3cpXH6jwqerbF6rp",
         type: "image",
-        x: 237.33333121405704,
-        y: -37.819445356910634,
-        width: 349.3333333333333,
-        height: 262,
+        x: 300.33333121405704,
+        y: 90.819445356910634,
+        width: 100,
+        height: 100,
+        angle: 0,
+        strokeColor: "transparent",
+        backgroundColor: "transparent",
+        fillStyle: "hachure",
+        strokeWidth: 1,
+        strokeStyle: "solid",
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: 795684509,
+        version: 4,
+        versionNonce: 916617149,
+        isDeleted: false,
+        boundElements: null,
+        updated: 1699879238757,
+        link: null,
+        locked: false,zIndex: 999999,
+        // status: "pending",
+        // fileId: "793a93d9ebb97ed53759a2678c4c936b5202dc64",
+        scale: [1, 1],
+      },
+    ];
+    const currentEle = excalidrawAPI?.getSceneElements();
+    console.log("currentele", currentEle);
+    const filteredCurrentEle = currentEle?.filter(
+      (element: any) => element?.fileId !== newTextElement[0]?.fileId
+    );
+
+    const updated = [...(filteredCurrentEle || []), ...(newTextElement || [])];
+    // const sceneData = {
+    //   elements: [...(currentEle || []), ...(newTextElement || [])],
+    // };
+    const sceneData = {
+      elements: restoreElements(updated, null),
+    };
+    console.log("sceneData", sceneData);
+
+    excalidrawAPI?.updateScene(sceneData as any);
+    const res = await fetch(imageSrc);
+    console.log("fetch", res);
+    const imageData = await res.blob();
+    const reader = new FileReader();
+    reader.readAsDataURL(imageData);
+
+    reader.onload = function () {
+      const imagesArray: BinaryFileData[] = [
+        {
+          id: id as BinaryFileData["id"],
+          dataURL: reader.result as BinaryFileData["dataURL"],
+          mimeType: MIME_TYPES.jpg,
+          created: 1644915140367,
+          lastRetrieved: 1644915140367,
+        },
+      ];
+
+      excalidrawAPI?.addFiles(imagesArray);
+    };
+  };
+
+  const handlebackgroundImageDivDrop = async (imageSrc: any) => {
+    const canvas = document.querySelector(
+      ".excalidraw__canvas"
+    ) as HTMLCanvasElement;
+    const width = canvas?.width;
+    const height = canvas?.height;
+    const newTextElement: any = [
+      {
+        fileId: "background",
+        id: "6-AIA3cpXH6jwqerbF6rp",
+        type: "image",
+        x: 0.33333121405704,
+        y: 0.819445356910634,
+        width: width / 1.8,
+        height: height / 1.8,
         angle: 0,
         strokeColor: "transparent",
         backgroundColor: "transparent",
@@ -260,115 +617,16 @@ export default function App() {
         // status: "pending",
         // fileId: "793a93d9ebb97ed53759a2678c4c936b5202dc64",
         scale: [1, 1],
-      },
-    ];
-    const currentEle = excalidrawAPI?.getSceneElements();
-    console.log("currentele", currentEle);
-    const updated = [...(currentEle || []), ...(newTextElement || [])];
-    // const sceneData = {
-    //   elements: [...(currentEle || []), ...(newTextElement || [])],
-    // };
-    const sceneData = {
-      elements: restoreElements(updated, null),
-    };
-    console.log("sceneData", sceneData);
-
-    excalidrawAPI?.updateScene(sceneData as any);
-    const res = await fetch("/rocket.jpeg");
-    console.log("fetch", res);
-    const imageData = await res.blob();
-    const reader = new FileReader();
-    reader.readAsDataURL(imageData);
-
-    reader.onload = function () {
-      const imagesArray: BinaryFileData[] = [
-        {
-          id: "rocket" as BinaryFileData["id"],
-          dataURL: reader.result as BinaryFileData["dataURL"],
-          mimeType: MIME_TYPES.jpg,
-          created: 1644915140367,
-          lastRetrieved: 1644915140367,
-        },
-      ];
-
-    
-      excalidrawAPI?.addFiles(imagesArray);
-    };
-  };
-  const [pointerData, setPointerData] = useState<{
-    pointer: { x: number; y: number };
-    button: "down" | "up";
-    pointersMap: Gesture["pointers"];
-  } | null>(null);
-
-  const renderSidebar = () => {
-    return (
-      <></>
-      // <Sidebar>
-      //   <Sidebar.Header>Custom header!</Sidebar.Header>
-      //   Custom sidebar!
-      // </Sidebar>
-    );
-  };
-  const handleImageDragStart = (event: React.DragEvent<HTMLImageElement>) => {
-    // Customize the drag data to include necessary information
-    console.log("srcc",event)
-    const imageSrc = event.currentTarget.src;
-    console.log("imageSrc", imageSrc);
-    // event.dataTransfer.setData("text/plain", imageSrc);
-    // fetchData(imageSrc);
-    handleRightSideDivDrop(imageSrc)
-    setDrop(true);
-  };
-  const handleRightSideDivDrop = async (imageSrc: any) => {
-    // event.preventDefault();
-    //const imageSrc = event.dataTransfer.getData("text/plain");
-    var canvas = document.querySelector('.excalidraw__canvas') as HTMLCanvasElement;
-    var width = canvas?.width;
-    var height = canvas?.height;
-console.log("class e",canvas,width,height)
-
-
-    const newTextElement: any = [
-      {
-        fileId: "rocket",
-        id: "6-AIA3cpXH6jwqerbF6rp",
-        type: "image",
-        x:0.33333121405704,
-        y: 0.819445356910634,
-        width: width/1.80,
-        height:height/1.80,
-        angle: 0,
-        strokeColor: "transparent",
-        backgroundColor: "transparent",
-        fillStyle: "hachure",
-        strokeWidth: 1,
-        strokeStyle: "solid",
-        roughness: 1,
-        opacity: 100,
-        groupIds: [],
-        frameId: null,
-        roundness: null,
-        seed: 795684509,
-        version: 4,
-        versionNonce: 916617149,
-        isDeleted: false,
-        boundElements: null,
-        updated: 1699879238757,
-        link: null,
-        locked: false,
-        // status: "pending",
-        // fileId: "793a93d9ebb97ed53759a2678c4c936b5202dc64",
-        scale: [1,1],
+        zIndex: 1,
       },
     ];
     const currentEle = excalidrawAPI?.getSceneElements();
     console.log("currentele", currentEle);
     const filteredCurrentEle = currentEle?.filter(
-      (element:any) => element?.fileId !== newTextElement[0]?.fileId
+      (element: any) => element?.fileId !== newTextElement[0]?.fileId
     );
-    
-    const updated = [...(filteredCurrentEle || []), ...(newTextElement || [])];
+
+    const updated = [...(newTextElement || []), ...(filteredCurrentEle || [])];
     // const sceneData = {
     //   elements: [...(currentEle || []), ...(newTextElement || [])],
     // };
@@ -387,7 +645,7 @@ console.log("class e",canvas,width,height)
     reader.onload = function () {
       const imagesArray: BinaryFileData[] = [
         {
-          id: "rocket" as BinaryFileData["id"],
+          id: "background" as BinaryFileData["id"],
           dataURL: reader.result as BinaryFileData["dataURL"],
           mimeType: MIME_TYPES.jpg,
           created: 1644915140367,
@@ -395,12 +653,9 @@ console.log("class e",canvas,width,height)
         },
       ];
 
-    
       excalidrawAPI?.addFiles(imagesArray);
     };
-   
   };
-  
 
   const renderMenu = () => {
     return (
@@ -432,26 +687,70 @@ console.log("class e",canvas,width,height)
   };
   return (
     <div className="App" ref={appRef}>
-        <div className="navbar">
-    <div className="dropdown">
-      <button className="dropbtn">Select Background</button>
-      <div className="dropdown-content">
-        <img src="messi.png"   onClick={(event)=>{  event.preventDefault();
-                handleImageDragStart(event as any)}} alt="Image 1"/>
-        <img src="pika.jpeg"   onClick={(event)=>{  event.preventDefault();
-                handleImageDragStart(event as any)}} alt="Image 2"/>
-        <img src="rocket.jpeg"   onClick={(event)=>{  event.preventDefault();
-                handleImageDragStart(event as any)}} alt="Image 3"/>
-     
+       <h1>HTML canvas</h1>
+      <div className="navbar">
+        <div className="dropdown">
+          <button className="dropbtn">Select Background</button>
+          <div className="dropdown-content">
+            <span>Select Background color </span>
+            <div style={{ display: "flex", columnGap: "12px" }}>
+              <div
+                className="color-option"
+                style={{ backgroundColor: "#ff0000" }}
+                onClick={() => handleColorChange("#ff0000")}
+              ></div>
+              <div
+                className="color-option"
+                style={{ backgroundColor: "#00ff00" }}
+                onClick={() => handleColorChange("#00ff00")}
+              ></div>
+              <div
+                className="color-option"
+                style={{ backgroundColor: "#0000ff" }}
+                onClick={() => handleColorChange("#0000ff")}
+              ></div>
+              <input
+                type="color"
+                value={selectedColor}
+                onChange={(e) => handleColorChange(e.target.value)}
+              />
+            </div>
+            <span> Select Background Image</span>
+            <div>
+              <img
+                src="messi.png"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleImageDragStart(event as any, "bg");
+                }}
+                alt="Image 1"
+              />
+              <img
+                src="pika.jpeg"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleImageDragStart(event as any, "bg");
+                }}
+                alt="Image 2"
+              />
+              <img
+                src="rocket.jpeg"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleImageDragStart(event as any, "bg");
+                }}
+                alt="Image 3"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-      <h1>HTML canvas</h1>
+
       <ExampleSidebar>
         <div className="button-wrapper">
-          <button className="update-scene" onClick={updateScene}>
+          {/* <button className="update-scene" onClick={updateScene}>
             Update Canvas
-          </button>
+          </button> */}
           <button
             className="reset-scene"
             onClick={() => {
@@ -523,7 +822,6 @@ console.log("class e",canvas,width,height)
           </div>
         </div>
 
-      
         {/* <div
             onClick={(event)=>{
               event.preventDefault();
@@ -586,7 +884,7 @@ console.log("class e",canvas,width,height)
               onLinkOpen={onLinkOpen}
               detectScroll={true}
               // onPointerDown={onPointerDown}
-            
+
               // renderSidebar={renderSidebar}
             >
               {/* {excalidrawAPI && (
@@ -610,39 +908,61 @@ console.log("class e",canvas,width,height)
             /> */}
           </div>
           <div className="sidebarr">
-    <div className="sidebarr-header">
-      <h2>Image Collection</h2>
-    </div>
-    <div className="image-list"
-      onDrop={handleRightSideDivDrop}
-      onDragOver={(event) => event.preventDefault()}
-      >
-      <img src="doremon.png"   onDragStart={handleImageDragStart} alt="Image 1"/>
-      <img src="pika.jpeg"   onDragStart={handleImageDragStart} alt="Image 2"/>
-      <img src="messi.png"  onDragStart={handleImageDragStart} alt="Image 3"/>
-      <img src="rocket.jpeg"  onDragStart={handleImageDragStart} alt="Image 3"/>
-    </div>
-  </div>
-          {/* <div
-            onDrop={handleRightSideDivDrop}
-            onDragOver={(event) => event.preventDefault()}
-          >
-            {" "}
+            <div className="sidebarr-header">
+              <h4>Advance setting</h4>
+            </div>
+            <select value={contentType} onChange={handleContentTypeChange}>
+        <option value="image">Images</option>
+        <option value="rowStyle">rowStyle</option>
+      </select>
+
+      <div
+        className="image-list"
+        onDrop={handleRightSideDivDrop}
+        onDragOver={(event) => event.preventDefault()}
+      >{contentType}
+        {/* Display list based on selected content type */}
+        {contentType === 'image' && (
+          <>
             <img
-              onDragStart={handleImageDragStart}
-              src="messi.png"
-              alt="messi"
-              style={{
-                height: "200px",
-                width: "240px",
-              }}
+              src="doremon.png"
+              onDragStart={(e) => handleImageDragStart(e as any, 'imgdrop')}
+              alt="Image 1"
             />
-          </div> */}
+            <img
+              src="pika.jpeg"
+              onDragStart={(e) => handleImageDragStart(e as any, 'imgdrop')}
+              alt="Image 2"
+            />
+            <img
+              src="messi.png"
+              onDragStart={(e) => handleImageDragStart(e as any, 'imgdrop')}
+              alt="Image 3"
+            />
+            <img
+              src="rocket.jpeg"
+              onDragStart={(e) => handleImageDragStart(e as any, 'imgdrop')}
+              alt="Image 3"
+            />
+          </>
+        )}
+
+        {contentType === 'rowStyle' && (
+          <>
+            {/* Add your SVG components here */}
+            <svg width="100" height="100">
+              <circle cx="50" cy="50" r="40" stroke="black" strokeWidth="3" fill="red" />
+            </svg>
+            {/* Add more SVG components as needed */}
+          </>
+        )}
+ </div>
+          </div>
         </div>
         <button style={{ background: "/rocket.jpeg" }} onClick={addTextElement}>
           Add Text Element
         </button>
       </ExampleSidebar>
-    </div> 
+    </div>
   );
 }
